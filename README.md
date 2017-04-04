@@ -1,6 +1,8 @@
 # chess-3-clock
 [Chess clock for three players](https://leonidovcharenko.github.io/chess-3-clock/clock) (one instance version)
 
+Веб-приложение оптимизировано для работы на мобильных устройствах
+
 ## Два варианта использования:
 
 ### Интегральные (одни часы на одном устройстве)
