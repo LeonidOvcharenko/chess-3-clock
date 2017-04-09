@@ -73,6 +73,7 @@ var onload = function(){
 			time: 10,
 			start: 0,
 			round: 0,
+			paused: false,
 			now: 0,
 			remote_now: 0,  // msec
 			remote_player_started: {s0:0,s1:0,s2:0},  // sec
@@ -184,6 +185,7 @@ var onload = function(){
 				'round': 0,
 				'start': Date.now(),
 				'now': Date.now(),
+				'paused_time': 0,
 				'ended': '?'
 			});
 			this.set_timer();
@@ -202,12 +204,28 @@ var onload = function(){
 			this.set({
 				'state': 'end',
 				'turn': '?',
-				'ended_in': this.get('now') - this.get('start')
+				'paused': false,
+				'paused_time': 0,
+				'ended_in': this.get('now') - this.get('start') - this.get('paused_time')
 			});
 			this.reset_timer();
 		},
 		'init-game': function(){
 			this.set('state', 'init');
+		},
+		'pause-game': function(){
+			var current = this.get();
+			var next = {paused: !current.paused};
+			if (current.paused) {
+				next.turn = current.last_turn;
+				next.last_turn = null;
+				next.paused_time = current.paused_time + Date.now();
+			} else {
+				next.turn = '?';
+				next.last_turn = current.turn;
+				next.paused_time = current.paused_time - Date.now();
+			}
+			this.set(next);
 		},
 		'turn-forward': function(){
 			var next = (this.get('turn')+1) % 3;

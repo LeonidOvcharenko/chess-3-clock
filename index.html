@@ -90,13 +90,14 @@
 				</div>
 				<div class="col-xs-12 col-sm-8">
 					<div class="btn-group-vertical btn-block">
-						<button type="button" class="btn btn-{{player.buttonclass}} btn-lg" on-click="turn-forward" {{(remote_session && session_player!=turn) ? 'disabled' : ''}}>
+						<button type="button" class="btn btn-{{player.buttonclass}} btn-lg" on-click="turn-forward" {{(remote_session && session_player!=turn) || paused ? 'disabled' : ''}}>
 							<span class="">ход {{player.title_}}</span><hr>
 							<h2>{{(remote_session && session_player!=turn) ? 'ожидается' : 'Сделан'}}</h2>
-							<span>{{mm(player.remained)}}<span class="tick">:</span>{{ss(player.remained)}}</span><br><br>
+							<span>{{mm(player.remained)}}<span class="{{paused ? '' : 'tick'}}">:</span>{{ss(player.remained)}}</span><br><br>
 						</button>
-						<button type="button" class="btn btn-lg btn-secondary" {{ round == 0 || (remote_session && session_player!=turn) ? 'disabled' : '' }} on-click="turn-backward"><i class="icon-back"></i> Назад: ход {{players[(turn+2)%3].title_}}</button>
-						<button type="button" class="btn btn-lg btn-secondary text-danger" {{ round == 0 || (remote_session && session_player!=turn) ? 'disabled' : '' }} on-click="end-game"><i class="icon-cancel"></i> Закончить игру</button>
+						<button type="button" class="btn btn-lg btn-secondary" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="turn-backward"><i class="icon-back"></i> Назад{{#if !paused}}: ход {{players[(turn+2)%3].title_}}{{/if}}</button>
+						<button type="button" class="btn btn-lg btn-{{paused ? 'info' : 'secondary text-warning'}}" {{ (remote_session && session_player!=0) ? 'disabled' : '' }} on-click="pause-game"><i class="icon-{{paused ? 'play tick-pulse' : 'pause'}}"></i> {{paused ? 'Продолжить' : 'Пауза'}}</button>
+						<button type="button" class="btn btn-lg btn-secondary text-danger" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="end-game"><i class="icon-cancel"></i> Закончить игру</button>
 					</div>
 				</div>
 			</div>
