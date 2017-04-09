@@ -58,6 +58,7 @@ ajax.api = function(func, data, callback) {
 
 };
 
+Ractive.DEBUG = false;
 var loaded = false;
 var onload = function(){
 	if (loaded) { return; } else { loaded = true; }
