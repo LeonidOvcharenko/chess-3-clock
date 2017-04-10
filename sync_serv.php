@@ -21,7 +21,8 @@ $database->update("games", array(
 	"duration" => 10,
 	"player_0" => 0,
 	"player_1" => 0,
-	"player_2" => 0
+	"player_2" => 0,
+	"player_3" => 0
 ), array(
 	"AND" => array(
 		"start[>]" => 0,
@@ -65,7 +66,8 @@ if ($action == 'reg') {
 			"start" => $start,
 			"duration" => $duration,
 			"rounds" => 0,
-			"player_0" => $start
+			"player_0" => $start,
+			"player_3" => $start
 		), array(
 			"code" => $code
 		));
@@ -83,7 +85,7 @@ if ($action == 'reg') {
 	$start = time();
 	$database->update("games", array(
 		"turn" => $player,
-		"rounds[".$sign."]" => 1,
+		"rounds[".($sign=='-' ? '-' : '+')."]" => $sign=='!' ? 0 : 1,
 		"player_".$player => $start-$elapsed
 	), array(
 		"code" => $code
@@ -91,14 +93,14 @@ if ($action == 'reg') {
 	$game = $database->select("games", "*", array(
 		"code" => $code
 	));
-	echo '{"status": "ready", "time":"'.$start.'", "s0":"'.$game[0]['player_0'].'", "s1":"'.$game[0]['player_1'].'", "s2":"'.$game[0]['player_2'].'"}';
+	echo '{"status": "ready", "time":"'.$start.'", "s0":"'.$game[0]['player_0'].'", "s1":"'.$game[0]['player_1'].'", "s2":"'.$game[0]['player_2'].'", "s3":"'.$game[0]['player_3'].'"}';
 } else if ($action == 'tick') {
 	$turn = $database->select("games", "*", array(
 		"code" => $code
 	));
 	$current_player = $turn[0]['turn'];
 	$time = ($turn[0]['duration'] >= 0) ? '"started": '.$turn[0]['player_'.$current_player] : '"ended_in": '.(-$turn[0]['duration']);
-	echo '{"status": "ready", "time":"'.time().'", "turn":'.$current_player.', '.$time.', "rounds": '.$turn[0]['rounds'].', "s0":"'.$turn[0]['player_0'].'", "s1":"'.$turn[0]['player_1'].'", "s2":"'.$turn[0]['player_2'].'"}';
+	echo '{"status": "ready", "time":"'.time().'", "turn":'.$current_player.', '.$time.', "rounds": '.$turn[0]['rounds'].', "s0":"'.$turn[0]['player_0'].'", "s1":"'.$turn[0]['player_1'].'", "s2":"'.$turn[0]['player_2'].'", "s3":"'.$turn[0]['player_3'].'"}';
 } else if ($action == 'end') {
 	$started = $database->select("games", "*", array(
 		"code" => $code
@@ -112,7 +114,8 @@ if ($action == 'reg') {
 			"duration" => -$duration,
 			"player_0" => 0,
 			"player_1" => 0,
-			"player_2" => 0
+			"player_2" => 0,
+			"player_3" => 0
 		), array(
 			"code" => $code
 		));
@@ -120,4 +123,5 @@ if ($action == 'reg') {
 	echo '{"status": "ready", "ended_in": '.$duration.', "rounds": '.$started[0]['rounds'].'}';
 }
 # синхронизация времени по белым
+# игрок №3 — пауза
 ?>

@@ -29,5 +29,6 @@ CREATE TABLE IF NOT EXISTS `games` (
   `player_0` int(11) NOT NULL DEFAULT '0',
   `player_1` int(11) NOT NULL DEFAULT '0',
   `player_2` int(11) NOT NULL DEFAULT '0',
+  `player_3` int(11) NOT NULL DEFAULT '0',
   KEY `code` (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

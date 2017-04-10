@@ -75,7 +75,7 @@
 				<div class="col-xs-12 col-sm-4">
 					<div class="container-fluid">
 						<div class="row">
-							{{#players:p}}
+							{{#players:p}}{{#if p!=3}}
 								<div class="col-xs-4 col-sm-12">
 									<div class="card {{ p==0 ? '' : 'card-inverse card-'+(p==1 ? 'danger' : 'black') }} text-xs-center">
 										<h3 class="card-header card-header-compact float-sm-left" title="{{.title}}"><i class="icon-crown {{ p==turn ? 'tick-pulse' : ''}}"></i></h3>
@@ -84,19 +84,19 @@
 										<progress class="progress progress-info progress-small" value="{{.remained}}" max="{{time * 60000}}"></progress>
 									</div>
 								</div>
-							{{/players}}
+							{{/if}}{{/players}}
 						</div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-8">
 					<div class="btn-group-vertical btn-block">
 						<button type="button" class="btn btn-{{player.buttonclass}} btn-lg" on-click="turn-forward" {{(remote_session && session_player!=turn) || paused ? 'disabled' : ''}}>
-							<span class="">ход {{player.title_}}</span><hr>
-							<h2>{{(remote_session && session_player!=turn) ? 'ожидается' : 'Сделан'}}</h2>
-							<span>{{mm(player.remained)}}<span class="{{paused ? '' : 'tick'}}">:</span>{{ss(player.remained)}}</span><br><br>
+							<span class="">ход {{!paused ? player.title_ : players[last_turn].title_}}</span><hr>
+							<h2>{{(remote_session && session_player!=turn)|| paused ? 'ожидается' : 'Сделан'}}</h2>
+							{{#if !paused}}<span>{{mm(player.remained)}}<span class="{{paused ? '' : 'tick'}}">:</span>{{ss(player.remained)}}</span>{{/if}}<br><br>
 						</button>
 						<button type="button" class="btn btn-lg btn-secondary" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="turn-backward"><i class="icon-back"></i> Назад{{#if !paused}}: ход {{players[(turn+2)%3].title_}}{{/if}}</button>
-						<button type="button" class="btn btn-lg btn-{{paused ? 'info' : 'secondary text-warning'}}" {{ (remote_session && session_player!=0) ? 'disabled' : '' }} on-click="pause-game"><i class="icon-{{paused ? 'play tick-pulse' : 'pause'}}"></i> {{paused ? 'Продолжить' : 'Пауза'}}</button>
+						<button type="button" class="btn btn-lg btn-{{paused ? 'info' : 'secondary text-warning'}}" {{ (remote_session && session_player!=turn && session_player!=last_turn) ? 'disabled' : '' }} on-click="pause-game"><i class="icon-{{paused ? 'play tick-pulse' : 'pause'}}"></i> {{paused ? 'Продолжить' : 'Пауза'}}</button>
 						<button type="button" class="btn btn-lg btn-secondary text-danger" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="end-game"><i class="icon-cancel"></i> Закончить игру</button>
 					</div>
 				</div>

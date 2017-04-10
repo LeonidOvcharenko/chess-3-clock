@@ -77,7 +77,7 @@ var onload = function(){
 			paused: false,
 			now: 0,
 			remote_now: 0,  // msec
-			remote_player_started: {s0:0,s1:0,s2:0},  // sec
+			remote_player_started: {s0:0,s1:0,s2:0,s3:0},  // sec
 			turn: '?',
 			player: null,
 			players: [{
@@ -101,6 +101,14 @@ var onload = function(){
 				buttonclass: 'black',
 				title: 'Чёрные',
 				title_: 'чёрных',
+				elapsed: 0,
+				remained: 0,
+				started: 0
+			},{
+				colorclass: '-',
+				buttonclass: '-',
+				title: 'Пауза',
+				title_: '-',
 				elapsed: 0,
 				remained: 0,
 				started: 0
@@ -156,7 +164,7 @@ var onload = function(){
 			if (Game.get('remote_session')) {
 				var code = Game.get('session');
 				ajax.get('/c3/sync.php', { action: 'end', code: code }, function(res){
-					Game.set('ended_in', res.ended_in*1000);
+					Game.set('ended_in', res.ended_in*1000-Game.get('players.3.elapsed'));
 				});
 			}
 		}
@@ -186,7 +194,6 @@ var onload = function(){
 				'round': 0,
 				'start': Date.now(),
 				'now': Date.now(),
-				'paused_time': 0,
 				'ended': '?'
 			});
 			this.set_timer();
@@ -196,7 +203,7 @@ var onload = function(){
 				var time = Game.get('time');
 				ajax.get('/c3/sync.php', { action: 'start', code: code, player: player, duration: time }, function(res){
 					Game.set({
-						remote_player_started: {s0:res.time, s1:0, s2:0}
+						remote_player_started: {s0:res.time, s1:0, s2:0, s3:0}
 					});
 				});
 			}
@@ -206,8 +213,7 @@ var onload = function(){
 				'state': 'end',
 				'turn': '?',
 				'paused': false,
-				'paused_time': 0,
-				'ended_in': this.get('now') - this.get('start') - this.get('paused_time')
+				'ended_in': this.get('now') - this.get('start') - this.get('players.3.elapsed')
 			});
 			this.reset_timer();
 		},
@@ -220,13 +226,18 @@ var onload = function(){
 			if (current.paused) {
 				next.turn = current.last_turn;
 				next.last_turn = null;
-				next.paused_time = current.paused_time + Date.now();
 			} else {
-				next.turn = '?';
+				next.turn = 3;
 				next.last_turn = current.turn;
-				next.paused_time = current.paused_time - Date.now();
 			}
 			this.set(next);
+			if (Game.get('remote_session')) {
+				var code = this.get('session');
+				var elapsed = Math.floor( Game.get('players.'+next.turn+'.elapsed') / 1000 );
+				ajax.get('/c3/sync.php', { action: 'switch', code: code, player: next.turn, elapsed: elapsed, sign: '!' }, function(res){
+					Game.set('remote_player_started', res);
+				});
+			}
 		},
 		'turn-forward': function(){
 			var next = (this.get('turn')+1) % 3;
@@ -283,7 +294,7 @@ var onload = function(){
 		},
 		'remote_player_started': function(data){
 			if (this.get('remote_session')) {
-				for (var i=0;i<3;i++){
+				for (var i=0;i<=3;i++){
 					var player_id = 'players.'+i;
 					// var next_elapsed = this.get(player_id+'.elapsed');
 					var started = data['s'+i] || 0;
@@ -316,7 +327,8 @@ var onload = function(){
 					update_times(res.time*1000, Game.get('turn'));
 					Game.set({
 						remote_now: res.time,
-						turn: res.turn,
+						turn: Game.get('last_turn')==null ? res.turn : 3,
+						paused: res.turn==3,
 						remote_player_started: res
 					});
 				});
