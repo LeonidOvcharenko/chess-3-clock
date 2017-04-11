@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `games` (
   `start` int(11) NOT NULL DEFAULT '0',
   `duration` int(11) NOT NULL DEFAULT '10',
   `turn` tinyint(4) NOT NULL,
+  `retired` tinyint(4) NOT NULL DEFAULT '-1',
   `rounds` int(11) NOT NULL DEFAULT '0',
   `player_0` int(11) NOT NULL DEFAULT '0',
   `player_1` int(11) NOT NULL DEFAULT '0',

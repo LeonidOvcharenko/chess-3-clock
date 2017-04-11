@@ -111,13 +111,13 @@ var Game = new Ractive({
 			started: 0
 		}],
 		ss: function(ms){
-			var sign = ms < 0 ? '—' : '';
 			var ss = Math.floor(Math.abs(ms) / 1000) % 60;
+			var sign = (ms < 0 && ss > 0) ? '—' : '';
 			return sign + (ss < 10 ? '0' : '') + ss;
 		},
 		mm: function(ms){
-			var sign = ms < 0 ? '—' : '';
 			var mm = Math.floor(Math.abs(ms) / 60000) % 60;
+			var sign = (ms < 0 && mm > 0) ? '—' : '';
 			return sign + (mm < 10 ? '0' : '') + mm;
 		},
 		N: function(n, strings){
@@ -191,6 +191,7 @@ Game.on({
 			'round': 0,
 			'start': Date.now(),
 			'now': Date.now(),
+			'retired': '?',
 			'ended': '?'
 		});
 		this.set_timer();
@@ -238,6 +239,7 @@ Game.on({
 	},
 	'turn-forward': function(){
 		var next = (this.get('turn')+1) % 3;
+		if (next==this.get('retired')) next = (next+1) % 3;
 		this.set('turn', next);
 		/* if (next == 0) */ this.add('round', 1);
 		
@@ -251,6 +253,7 @@ Game.on({
 	},
 	'turn-backward': function(){
 		var prev = (this.get('turn')+2) % 3;
+		if (prev==this.get('retired')) prev = (prev+2) % 3;
 		this.set('turn', prev);
 		/* if (prev == 2) */ this.subtract('round', 1);
 		
@@ -334,10 +337,16 @@ Game.observe({
 		}
 	},
 	'player.remained': function(remained){
-		if (this.get('state')!='run' || this.get('turn')=='?') return;
+		var turn = this.get('turn');
+		if (this.get('state')!='run' || turn=='?') return;
 		if (remained<=0) {
-			this.set('ended', this.get('turn'));
-			this.fire('end-game');
+			if (this.get('retired')=='?') {
+				this.set('retired', turn);
+				this.fire('turn-forward');
+			} else if (this.get('retired')!=turn) {
+				this.set('ended', turn);
+				this.fire('end-game');
+			}
 		}
 	}
 });
