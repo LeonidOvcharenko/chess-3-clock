@@ -60,6 +60,7 @@ ajax.api = function(func, data, callback) {
 
 Ractive.DEBUG = false;
 var A = {
+	button: new Audio('audio/button.wav'),
 	tick: new Audio('audio/tick.wav'),
 	warn: new Audio('audio/warning.wav'),
 	tack: new Audio('audio/end.wav')
@@ -210,6 +211,7 @@ Game.on({
 				});
 			});
 		}
+		A.tack.play();
 	},
 	'end-game': function(){
 		this.set({
@@ -244,6 +246,7 @@ Game.on({
 		}
 	},
 	'turn-forward': function(){
+		A.button.play();
 		var next = (this.get('turn')+1) % 3;
 		if (next==this.get('retired')) next = (next+1) % 3;
 		this.set('turn', next);
@@ -258,6 +261,7 @@ Game.on({
 		}
 	},
 	'turn-backward': function(){
+		A.button.play();
 		var prev = (this.get('turn')+2) % 3;
 		if (prev==this.get('retired')) prev = (prev+2) % 3;
 		this.set('turn', prev);
