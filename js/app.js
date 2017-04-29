@@ -59,6 +59,11 @@ ajax.api = function(func, data, callback) {
 };
 
 Ractive.DEBUG = false;
+var A = {
+	tick: new Audio('audio/tick.wav'),
+	warn: new Audio('audio/warning.wav'),
+	tack: new Audio('audio/end.wav')
+};
 var Game = new Ractive({
 	el: 'content',
 	template: '#content-tpl',
@@ -308,11 +313,18 @@ Game.observe({
 		if (this.get('state')!='run' || this.get('turn')=='?') return;
 		var update_times = function(t, i, s){
 			var player_id = 'players.'+i;
-			var started = s || Game.get(player_id+'.started') || t-1;
+			var started = Game.get(player_id+'.started') || t-1;
 			var time = Game.get('time')*60000;
 			Game.set(player_id+'.elapsed', t - started);
 			Game.set(player_id+'.remained', time - t + started);
 			Game.update('player.remained');
+			
+			var rem = Game.get('player.remained');
+			var new_s = Math.round(t/1000)%10;
+			if ((s != new_s) && !Game.get('paused')) {
+				((rem <= 500) ? A.tack : (rem <= 10000) ? A.warn : A.tick ).play();
+			}
+			return new_s;
 		};
 		
 		if (Game.get('remote_session')) {
@@ -324,7 +336,7 @@ Game.observe({
 					Game.fire('end-game');
 					return;
 				}
-				update_times(res.time*1000, Game.get('turn'));
+				Game.tick = update_times(res.time*1000, Game.get('turn'), Game.tick);
 				Game.set({
 					remote_now: res.time,
 					turn: Game.get('last_turn')==null ? res.turn : 3,
@@ -333,7 +345,7 @@ Game.observe({
 				});
 			});
 		} else {
-			update_times(now, Game.get('turn'));
+			Game.tick = update_times(now, Game.get('turn'), Game.tick);
 		}
 	},
 	'player.remained': function(remained){
