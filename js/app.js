@@ -219,6 +219,7 @@ Game.on({
 			'ended_in': this.get('now') - this.get('start') - this.get('players.3.elapsed')
 		});
 		this.reset_timer();
+		A.tack.play();
 	},
 	'init-game': function(){
 		this.set('state', 'init');
@@ -322,7 +323,7 @@ Game.observe({
 			var rem = Game.get('player.remained');
 			var new_s = Math.round(t/1000)%10;
 			if ((s != new_s) && !Game.get('paused')) {
-				((rem <= 500) ? A.tack : (rem <= 10000) ? A.warn : A.tick ).play();
+				((rem <= 1000) ? A.tack : (rem <= 11000) ? A.warn : A.tick ).play();
 			}
 			return new_s;
 		};
