@@ -214,13 +214,18 @@ Game.on({
 		A.tack.play();
 	},
 	'end-game': function(){
-		this.set({
-			'state': 'end',
-			'turn': '?',
-			'paused': false,
-			'ended_in': this.get('now') - this.get('start') - this.get('players.3.elapsed')
-		});
-		this.reset_timer();
+		if (this.get('retired')=='?') {
+			this.set('retired', this.get('turn'));
+			this.fire('turn-forward');
+		} else {
+			this.set({
+				'state': 'end',
+				'turn': '?',
+				'paused': false,
+				'ended_in': this.get('now') - this.get('start') - this.get('players.3.elapsed')
+			});
+			this.reset_timer();
+		}
 		A.tack.play();
 	},
 	'init-game': function(){

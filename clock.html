@@ -87,14 +87,14 @@
 				</div>
 				<div class="col-xs-12 col-sm-8">
 					<div class="btn-group-vertical btn-block">
-						<button type="button" class="btn btn-{{player.buttonclass}} btn-lg" on-click="turn-forward" {{(remote_session && session_player!=turn) || paused ? 'disabled' : ''}}>
+						<button type="button" class="btn btn-{{!paused ? player.buttonclass : players[last_turn].buttonclass}} btn-lg" on-click="turn-forward" {{(remote_session && session_player!=turn) || paused ? 'disabled' : ''}}>
 							<span class="">ход {{!paused ? player.title_ : players[last_turn].title_}}</span><hr>
 							<h2>{{(remote_session && session_player!=turn)|| paused ? 'ожидается' : 'Сделан'}}</h2>
 							{{#if !paused}}<span>{{mm(player.remained)}}<span class="{{paused ? '' : 'tick'}}">:</span>{{ss(player.remained)}}</span>{{/if}}<br><br>
 						</button>
 						<button type="button" class="btn btn-lg btn-secondary" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="turn-backward"><i class="icon-back"></i> Назад{{#if !paused}}: ход {{(turn+2)%3!=retired ? players[(turn+2)%3].title_ : players[(turn+1)%3].title_}}{{/if}}</button>
 						<button type="button" class="btn btn-lg btn-{{paused ? 'info' : 'secondary text-warning'}}" {{ (remote_session && session_player!=turn && session_player!=last_turn) ? 'disabled' : '' }} on-click="pause-game"><i class="icon-{{paused ? 'play tick-pulse' : 'pause'}}"></i> {{paused ? 'Продолжить' : 'Пауза'}}</button>
-						<button type="button" class="btn btn-lg btn-secondary text-danger" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="end-game"><i class="icon-cancel"></i> Закончить игру</button>
+						<button type="button" class="btn btn-lg btn-secondary text-danger" {{ round == 0 || (remote_session && session_player!=turn) || paused ? 'disabled' : '' }} on-click="end-game"><i class="icon-cancel"></i> {{#if retired!='?'}}Закончить игру{{else}}Проигрыш{{/if}}</button>
 					</div>
 				</div>
 			</div>
